@@ -13,7 +13,7 @@ white = (255, 255, 255);
 
 game_over = False;
 
-font = pygame.font.Font('freesansbold.ttf', 20);
+font = pygame.font.Font('PixelOperator.ttf', 30);
 
 player_y = 130;
 computer_y = 130;
@@ -92,8 +92,8 @@ while running:
     ball = pygame.draw.rect(screen, white, [ball_x, ball_y, 10, 10])
     game_over = check_game_over(ball_x, game_over);
 
-    score_text = font.render('Score: ' + str(score), True, white, black);
-    screen.blit(score_text, (115, 130));
+    score_text = font.render(str(score), True, white);
+    screen.blit(score_text, (140, 70));
 
 
     if not game_over:
@@ -141,6 +141,8 @@ while running:
                 score = 0;
 
     player_y += player_speed * player_direction;
+    ball_speed = 2 + (score//10);
+    ball_y_speed = 1 + (score//15);
 
     pygame.display.flip();
 
