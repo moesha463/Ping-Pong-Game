@@ -2,7 +2,13 @@ import pygame;
 
 pygame.init();
 
-screen = pygame.display.set_mode([300, 300]);
+SCREEN_WIDTH = 300
+SCREEN_HEIGHT = 300
+PADDLE_WIDTH = 10
+PADDLE_HEIGHT = 40
+BALL_SIZE = 10
+
+screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT]);
 pygame.display.set_caption('Ping Pong Game');
 
 timer = pygame.time.Clock()
@@ -32,14 +38,20 @@ score = 0;
 
 
 def update_ai(ball_y, computer_y):
-    computer_speed = 3;
+    computer_speed = 2;
+    target_y = ball_y + 5 - 15;
 
-    if computer_y + 15 > ball_y + 5:
-        computer_y -= computer_speed;
-    elif computer_y + 15 < ball_y + 5:
-        computer_y += computer_speed;
+    if computer_y < target_y:
+        computer_y += min(computer_speed, target_y - computer_y)
+    elif computer_y > target_y:
+        computer_y -= min(computer_speed, computer_y - target_y)
     
-    return computer_y;
+    if computer_y < 0:
+        computer_y = 0
+    elif computer_y > 260:
+        computer_y = 260
+    
+    return computer_y
 
 def check_collisions(ball, player, computer, ball_x_direction, score):
     if ball.colliderect(player) and ball_x_direction == -1:
@@ -87,9 +99,9 @@ while running:
     timer.tick(framerate);
     screen.fill(black);
     
-    player = pygame.draw.rect(screen, white, [5, player_y, 10, 40]);
-    computer = pygame.draw.rect(screen, white, [285, computer_y, 10, 40]);
-    ball = pygame.draw.rect(screen, white, [ball_x, ball_y, 10, 10])
+    player = pygame.draw.rect(screen, white, [5, player_y, PADDLE_WIDTH, PADDLE_HEIGHT]);
+    computer = pygame.draw.rect(screen, white, [285, computer_y, PADDLE_WIDTH, PADDLE_HEIGHT]);
+    ball = pygame.draw.rect(screen, white, [ball_x, ball_y, BALL_SIZE, BALL_SIZE])
     game_over = check_game_over(ball_x, game_over);
 
     score_text = font.render(str(score), True, white);
@@ -140,7 +152,12 @@ while running:
                 ball_y_speed = 1;
                 score = 0;
 
-    player_y += player_speed * player_direction;
+    player_y += player_speed * player_direction
+    if player_y < 0:
+        player_y = 0
+    elif player_y > 260:
+        player_y = 260
+
     ball_speed = 2 + (score//10);
     ball_y_speed = 1 + (score//15);
 
