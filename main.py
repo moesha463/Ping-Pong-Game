@@ -19,7 +19,45 @@ ball_y = 145;
 player_direction = 0;
 player_speed = 3;
 
+ball_x_direction = 1;
+ball_y_direction = 1;
+ball_speed = 2;
+ball_y_speed = 1;
+
 running = True;
+
+def update_ai(ball_y, computer_y):
+    computer_speed = 3;
+
+    if computer_y + 15 > ball_y + 5:
+        computer_y -= computer_speed;
+    elif computer_y + 15 < ball_y + 5:
+        computer_y += computer_speed;
+    
+    return computer_y;
+
+def update_ball(ball_x_direction, ball_y_direction, ball_x, ball_y, ball_speed, ball_y_speed):
+    if ball_x_direction == 1 and ball_x < 290:
+        ball_x += ball_speed;
+    elif ball_x_direction == 1 and ball_x >= 290:
+        ball_x_direction *= -1;
+    
+    if ball_x_direction == -1 and ball_x > 0:
+        ball_x -= ball_speed;
+    elif ball_x_direction == -1 and ball_x <= 0:
+        ball_x_direction *= -1;
+    
+    if ball_y_direction == 1 and ball_y < 290:
+        ball_y += ball_y_speed;
+    elif ball_y_direction == 1 and ball_y >= 290:
+        ball_y_direction *= -1;
+    
+    if ball_y_direction == -1 and ball_y > 0:
+        ball_y -= ball_y_speed;
+    elif ball_y_direction == -1 and ball_y <= 0:
+        ball_y_direction *= -1;
+
+    return ball_x_direction, ball_y_direction, ball_x, ball_y;
 
 while running:
     timer.tick(framerate);
@@ -28,6 +66,12 @@ while running:
     player = pygame.draw.rect(screen, white, [5, player_y, 10, 40]);
     computer = pygame.draw.rect(screen, white, [285, computer_y, 10, 40]);
     ball = pygame.draw.rect(screen, white, [ball_x, ball_y, 10, 10])
+    computer_y = update_ai(ball_y, computer_y);
+
+    ball_x_direction, ball_y_direction, ball_x, ball_y = update_ball(ball_x_direction, ball_y_direction, ball_x, ball_y, ball_speed, ball_y_speed)
+    
+    update_ball(ball_x_direction, ball_y_direction, ball_x, ball_y, ball_speed, ball_y_speed);
+
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
