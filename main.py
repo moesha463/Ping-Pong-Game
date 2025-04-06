@@ -12,6 +12,7 @@ screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT]);
 
 icon = pygame.image.load('./assets/images/icon.png');
 pygame.display.set_icon(icon);
+
 pygame.display.set_caption('Ping Pong Game');
 
 timer = pygame.time.Clock()
@@ -22,7 +23,9 @@ white = (255, 255, 255);
 
 game_over = False;
 
-font = pygame.font.Font('./assets/fonts/PixelOperator.ttf', 25);
+bounce_sound = pygame.mixer.Sound('./assets/sounds/bounce.mp3')
+
+font = pygame.font.Font('./assets/fonts/PixelOperator.ttf', 30);
 
 player_y = 130;
 computer_y = 130;
@@ -43,30 +46,26 @@ level_up_time = 0;
 
 
 def update_ai(ball_y, computer_y):
-    computer_speed = 2;
-    target_y = ball_y + 5 - 15;
-
-    if computer_y < target_y:
-        computer_y += min(computer_speed, target_y - computer_y)
-    elif computer_y > target_y:
-        computer_y -= min(computer_speed, computer_y - target_y)
-    
+    computer_y = ball_y - PADDLE_HEIGHT // 2
     if computer_y < 0:
         computer_y = 0
-    elif computer_y > 260:
-        computer_y = 260
-    
+    elif computer_y > SCREEN_HEIGHT - PADDLE_HEIGHT:
+        computer_y = SCREEN_HEIGHT - PADDLE_HEIGHT
     return computer_y
+
 
 def check_collisions(ball, player, computer, ball_x_direction, score):
     if ball.colliderect(player) and ball_x_direction == -1:
-        ball_x_direction = 1;
-        score += 1;
+        ball_x_direction = 1
+        score += 1
+        bounce_sound.play()
     elif ball.colliderect(computer) and ball_x_direction == 1:
-        ball_x_direction = -1;
-        score += 1;
+        ball_x_direction = -1
+        score += 1
+        bounce_sound.play()
     
-    return ball_x_direction, score;
+    return ball_x_direction, score
+
 
 def update_ball(ball_x_direction, ball_y_direction, ball_x, ball_y, ball_speed, ball_y_speed):
     if ball_x_direction == 1 and ball_x < 290:
@@ -137,7 +136,7 @@ while running:
             level_up_time = pygame.time.get_ticks()
 
     if level_up_time > 0 and pygame.time.get_ticks() - level_up_time < 2000:
-        level_text = font.render(f'Level {current_level}', True, white, black)
+        level_text = font.render(f'Level {current_level}', True, white)
         screen.blit(level_text, (120, 130))
 
     ball_x_direction, score = check_collisions(ball, player, computer, ball_x_direction, score);
