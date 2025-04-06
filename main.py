@@ -9,6 +9,9 @@ PADDLE_HEIGHT = 40
 BALL_SIZE = 10
 
 screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT]);
+
+icon = pygame.image.load('./assets/images/icon.png');
+pygame.display.set_icon(icon);
 pygame.display.set_caption('Ping Pong Game');
 
 timer = pygame.time.Clock()
@@ -19,7 +22,7 @@ white = (255, 255, 255);
 
 game_over = False;
 
-font = pygame.font.Font('PixelOperator.ttf', 30);
+font = pygame.font.Font('./assets/fonts/PixelOperator.ttf', 25);
 
 player_y = 130;
 computer_y = 130;
@@ -35,6 +38,8 @@ ball_speed = 2;
 ball_y_speed = 1;
 
 score = 0;
+current_level = 1;
+level_up_time = 0;
 
 
 def update_ai(ball_y, computer_y):
@@ -92,6 +97,20 @@ def check_game_over(ball_x, game_over):
     
     return game_over;
 
+def reset_game():
+    global player_y, computer_y, ball_x, ball_y, player_direction, ball_x_direction, ball_y_direction, ball_speed, ball_y_speed, score, game_over
+    player_y = 130
+    computer_y = 130
+    ball_x = 145
+    ball_y = 145
+    player_direction = 0
+    ball_x_direction = 1
+    ball_y_direction = 1
+    ball_speed = 2
+    ball_y_speed = 1
+    score = 0
+    game_over = False
+
 
 running = True;
 
@@ -112,16 +131,26 @@ while running:
         computer_y = update_ai(ball_y, computer_y);
         ball_x_direction, ball_y_direction, ball_x, ball_y = update_ball(ball_x_direction, ball_y_direction, ball_x, ball_y, ball_speed, ball_y_speed);
 
+        new_level = 1 + (score // 10)
+        if new_level > current_level:
+            current_level = new_level
+            level_up_time = pygame.time.get_ticks()
+
+    if level_up_time > 0 and pygame.time.get_ticks() - level_up_time < 2000:
+        level_text = font.render(f'Level {current_level}', True, white, black)
+        screen.blit(level_text, (120, 130))
+
     ball_x_direction, score = check_collisions(ball, player, computer, ball_x_direction, score);
 
     if game_over:
         game_over_text = font.render('Game Over', True, white, black);
-        screen.blit(game_over_text, (90, 130));
+        screen.blit(game_over_text, (100, 130));
 
-        restart_button = pygame.draw.rect(screen, black, [70, 170, 100, 20])
+        current_time = pygame.time.get_ticks() // 500
 
-        restart_text = font.render('Press to restart', True, white, black);
-        screen.blit(restart_text, (70, 170));
+        if current_time % 2 == 0:
+            restart_text = font.render('Press any button', True, white, black)
+            screen.blit(restart_text, (65, 170))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -131,26 +160,13 @@ while running:
                 player_direction = -1;
             if event.key == pygame.K_s:
                 player_direction = 1;
+            if game_over:
+                reset_game()
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_w:
                 player_direction = 0;
             if event.key == pygame.K_s:
                 player_direction = 0;
-        if event.type == pygame.MOUSEBUTTONDOWN and game_over == True:
-            if restart_button.collidepoint(event.pos):
-                game_over = False;
-
-                player_y = 130;
-                computer_y = 130;
-                ball_x = 145;
-                ball_y = 145;
-                player_direction = 0;
-                player_speed = 3;
-                ball_x_direction = 1;
-                ball_y_direction = 1;
-                ball_speed = 2;
-                ball_y_speed = 1;
-                score = 0;
 
     player_y += player_speed * player_direction
     if player_y < 0:
