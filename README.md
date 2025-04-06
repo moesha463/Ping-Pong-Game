@@ -12,6 +12,5 @@ A classic ping-pong game built with Python using the Pygame library. Control you
 
 ## Requirements
 To run the game, you’ll need the following:
-**Pygame** — The game development library. Install it via pip:
   ```bash
   pip install pygame
